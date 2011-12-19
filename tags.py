@@ -43,6 +43,11 @@ class Tag(Node):
         self.blocks = self.__class__._parse_blocks(parser, token)
 
     def render(self, context):
+        """
+        Set the rendering context and invoke the block processors as
+        found in the template.
+        
+        """
         self.template_context = context
 
         output = mark_safe('')
@@ -141,11 +146,14 @@ def tag_block(name=None, next_blocks=None):
         def processor_wrapper(tag_instance, block, *args, **kwargs):
             if tag_instance.__class__.resolve_block_parameters:
                 # Resolve variables in the template context
-                resolve = lambda variable: \
-                    Variable(variable).resolve(tag_instance.template_context)
-                
-                args = tuple(resolve(arg) for arg in args)
-                kwargs = {key: resolve(value) for key, value in kwargs.items()}
+                args = tuple(
+                    Variable(arg).resolve(tag_instance.template_context)
+                        for arg in args
+                    )
+                kwargs = {
+                    key: value.resolve(tag_instance.template_context)
+                        for key, value in kwargs.items()
+                    }
             
             return processor(tag_instance, block, *args, **kwargs)
         
