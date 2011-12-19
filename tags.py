@@ -64,21 +64,18 @@ class Tag(Node):
         
         # Process first block
         block_arguments = token.split_contents()
-        opening_keyword = block_arguments.pop(0)
-        
-        # Prepare the case of the first block as the rest of them
-        block_keyword = opening_keyword
-        next_candidates = (opening_keyword,)
+        block_keyword = block_arguments.pop(0)
         
         processors = cls._get_declared_blocks()
-        closing_keyword = 'end_' + opening_keyword
+        closing_keyword = 'end_' + block_keyword
         while(True):
+            print 
             try:
                 block_processor = processors[block_keyword]
             except KeyError:
                 raise TemplateSyntaxError(
                     'Block %r not found, candidates are %r' % 
-                        (block_keyword, next_candidates)
+                        (block_keyword, block_processor._next_blocks)
                     )
             
             # Parse token keyword arguments if necessary
