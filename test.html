@@ -1,0 +1,43 @@
+{% load templatetags %}
+
+
+<html>
+    <head>
+        <title>Test page | Class-based Django template tags</title>
+    </head>
+    
+    <body>
+		if: 
+        {% if 1 == 1 %}good{% end_if %}
+        <br />
+        
+        if-else: 
+        {% if 1 == 1 %}good{% else %}bad{% end_if %}
+        {% if 2 == 1 %}bad{% else %}good{% end_if %}
+        <br />
+        
+        if-elif:
+        {% if 1 == 1 %}good{% elif 2 == 1 %}bad{% else %}bad{% end_if %}
+        {% if 2 == 1 %}bad{% elif 1 == 1 %}good{% else %}bad{% end_if %}
+        {% if 2 == 1 %}bad{% elif 3 == 1 %}bad{% end_if %}
+        {% if 2 == 1 %}bad{% elif 3 == 1 %}bad{% else %}good{% end_if %}
+        
+        {% headed_box %}
+            Title for the header
+        {% begin_box_content %}
+            <span>This is the body of the box</span>
+        {% end_headed_box %}
+        
+        {% headed_box 'h3' %}
+            Title for the header
+        {% begin_box_content %}
+            <span>This is the body of the box</span>
+        {% end_headed_box %}
+        
+        {% headed_box title_tag='h4' %}
+            Title for the header
+        {% begin_box_content %}
+            <span>This is the body of the box</span>
+        {% end_headed_box %}
+    </body>
+</html>
