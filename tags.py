@@ -74,7 +74,6 @@ class Tag(Node):
         processors = cls._get_declared_blocks()
         closing_keyword = 'end_' + block_keyword
         while(True):
-            print 
             try:
                 block_processor = processors[block_keyword]
             except KeyError:
