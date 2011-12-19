@@ -17,20 +17,17 @@ register = Library()
 class IfElifTag(Tag):
     """Smart if template tag with else-if support."""
 
+    resolve_block_parameters = False
+    
     def __init__(self, *args, **kwargs):
         super(IfElifTag, self).__init__(*args, **kwargs)
         self._previous_condition_is_met = False
 
-    @tag_block(
-        'if', next_blocks=('elif', 'else', 'end_if'), resolve_parameters=False)
+    @tag_block('if', next_blocks=('elif', 'else', 'end_if'))
     def if_block(self, block, *raw_condition):
         return self._conditional_block(block, *raw_condition)
     
-    @tag_block(
-        'elif',
-        next_blocks=('elif', 'else', 'end_if'),
-        resolve_parameters=False,
-        )
+    @tag_block('elif', next_blocks=('elif', 'else', 'end_if'))
     def elif_block(self, block, *raw_condition):
         return self._conditional_block(block, *raw_condition)
     
