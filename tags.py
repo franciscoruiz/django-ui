@@ -27,10 +27,6 @@ class Tag(Node):
     
     The output will be the sum of every processed block.
     
-    The ending tag is implicitly defined as 'end_' + the name of the tag
-    and it must be specified as a `next_block` for tag blocks that could
-    be found as the last block.
-     
     """
     
     def __init__(self, parser, token):
@@ -131,10 +127,10 @@ def tag_block(name=None, next_blocks=None, resolve_parameters=True):
     :param `name`: Name of the tag block. If it's not specified,
         the method name will be used.
     :param `resolve_parameters`: Whether the block parameters will be
-        pre-processed and checked against the declared arguments
-        following standard rules in Python.
+        resolved as variables in the context of the template.
     :param `next_blocks`: Collection of blocks (by name) allowed after
-        this block.
+        this block. The implicitly-defined closing tag must be included
+        if the block can be found as the last one.
 
     """
 

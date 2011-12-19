@@ -44,7 +44,7 @@ class IfElifTag(Tag):
             self._previous_condition_is_met = True
             block_result = block.render(self.template_context)
         else:
-            block_result = None
+            block_result = mark_safe('')
 
         return block_result
     
