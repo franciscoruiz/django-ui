@@ -173,7 +173,7 @@ class InclusionTag(Tag):
     Invoke every block processor and render ``template_name`` with the
     (potentially altered) template context.
     
-    The block processing methods (decorated with :func:`tag_block`) must
+    The block-processing methods (decorated with :func:`tag_block`) must
     return a dictionary-like object as their addition to the template
     context.
 
@@ -185,7 +185,7 @@ class InclusionTag(Tag):
     def render(self, context):
         self.template_context = context
 
-        # Process every block
+        # Update the context with the result of every block processor
         for processor, args, kwargs, body in self.blocks:
             context_addition = processor(self, body, *args, **kwargs)
             context.update(context_addition)
