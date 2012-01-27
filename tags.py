@@ -8,6 +8,7 @@ TODO:
  - Which is the best way to define the closing keyword? Implicit vs. explicit.
 
 """
+from collections import OrderedDict
 from functools import wraps
 
 from django.template.base import Node
@@ -28,14 +29,14 @@ class Tag(Node):
     The output will be the sum of every processed block.
     
     """
-    
+
     resolve_block_parameters = True
     """
     Whether blocks parameters will be resolved as variables in the context
     of the template.
     
     """
-    
+
     def __init__(self, parser, token):
         self.parser = parser
         self.template_context = None
@@ -51,26 +52,26 @@ class Tag(Node):
         self.template_context = context
 
         output = mark_safe('')
-        for processor, args, kwargs, body in self.blocks:
+        for processor, args, kwargs, body in self.blocks.values():
             output += processor(self, body, *args, **kwargs)
         return output
-    
+
     @classmethod
     def _parse_blocks(cls, parser, token):
         """
-        Return a list of tag blocks as found in the template.
+        Return an :class:`OrderedDict` of tag blocks as found in the template.
         
         Each block will be defined as:
         
-        (block_processor, block_arguments, block_kwargs, block_body)
+        keyword: (processor, arguments, kwargs, body)
         
         """
-        blocks = []
-        
+        blocks = OrderedDict()
+
         # Process first block
         block_arguments = token.split_contents()
         block_keyword = block_arguments.pop(0)
-        
+
         processors = cls._get_declared_blocks()
         closing_keyword = 'end_' + block_keyword
         while(True):
@@ -78,10 +79,10 @@ class Tag(Node):
                 block_processor = processors[block_keyword]
             except KeyError:
                 raise TemplateSyntaxError(
-                    'Block %r not found, candidates are %r' % 
+                    'Block %r not found, candidates are %r' %
                         (block_keyword, block_processor._next_blocks)
                     )
-            
+
             # Parse token keyword arguments if necessary
             if cls.resolve_block_parameters:
                 # The parsed keyword arguments are removed from the original
@@ -89,19 +90,19 @@ class Tag(Node):
                 block_kwargs = token_kwargs(block_arguments, parser)
             else:
                 block_kwargs = {}
-            
+
             # Parse the body of the block
             next_blocks = _MultiBlockTagPrefixes(block_processor._next_blocks)
             block_body = parser.parse(next_blocks)
-            
-            blocks.append(
+
+            blocks[block_keyword] = (
                 (block_processor, block_arguments, block_kwargs, block_body))
 
             # Parse next block
             token = parser.next_token()
             block_arguments = token.split_contents()
             block_keyword = block_arguments.pop(0)
-            
+
             if block_keyword == closing_keyword:
                 break
 
@@ -153,15 +154,15 @@ def tag_block(name=None, next_blocks=None):
                     key: value.resolve(tag_instance.template_context)
                         for key, value in kwargs.items()
                     }
-            
+
             return processor(tag_instance, block, *args, **kwargs)
-        
+
         # Register the block name
         processor_wrapper._block_name = name or processor.__name__
         processor_wrapper._next_blocks = next_blocks
-        
+
         return processor_wrapper
-    
+
     return _actual_wrapper
 
 
@@ -186,10 +187,10 @@ class InclusionTag(Tag):
         self.template_context = context
 
         # Update the context with the result of every block processor
-        for processor, args, kwargs, body in self.blocks:
+        for processor, args, kwargs, body in self.blocks.values():
             context_addition = processor(self, body, *args, **kwargs)
             context.update(context_addition)
         return render_to_string(self.template_name, context)
 
-    
+
 #}
